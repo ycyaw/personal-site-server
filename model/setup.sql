@@ -11,10 +11,11 @@ CREATE TABLE user_t(
 );
 
 -- 文章表
-CREATE TABLE artical_t(
-    id    SERIAL PRIMARY KEY,
-    title VARCHAR(64),
-    category VARCHAR(8),
-    content VARCHAR(1024),
+CREATE TABLE article_t(
+    id          SERIAL PRIMARY KEY,
+    title       VARCHAR(64),
+    category    VARCHAR(8),
+    content     TEXT,
+    reading     BIGINT,
+    releaseDate TIMESTAMP
 );
-
