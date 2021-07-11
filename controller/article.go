@@ -1,32 +1,41 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
+	"personal-site/model"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Article struct {
-	Title    string `json:"title"`
-	Category string `json:"category"`
-	Content  string `json:"content"`
-}
-
 func Latest(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"data": gin.H{
-			"title": "this is a test title",
-			"text":  "hwehgAWGah\nwgwagWG\ngWG\n",
-		},
-	})
+
+	articles, err := model.LatestArticle()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"data": articles,
+		})
+	}
+	
 }
 
 func Create(c *gin.Context) {
-	article := Article{}
+	article := model.Article{}
 	c.BindJSON(&article)
 
-	fmt.Println(article.Title)
-	fmt.Println(article.Category)
-	fmt.Println(article.Content)
+	err := model.InsertArticle(article.Title, article.Category, article.Content)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "ok",
+		})
+	}
 }
