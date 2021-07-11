@@ -22,7 +22,10 @@ func main() {
 	r.GET("/api/latest", controller.Latest)
 
 	// 依据id获取指定文章
-	r.GET("api/article", controller.ArticleOfId)
+	r.GET("/api/article", controller.ArticleOfId)
+
+	// 依据分类获取文章
+	r.GET("/api/articleyycategory", controller.ArticleByCategory)
 
 	// 新建文章
 	r.POST("/api/create", controller.Create)

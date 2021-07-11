@@ -47,6 +47,22 @@ func ArticleOfId(c *gin.Context) {
 	}
 }
 
+func ArticleByCategory(c *gin.Context) {
+	category := c.Query("category")
+
+	articles, err := model.QueryByArticleCategory(category)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"data": articles,
+		})
+	}
+}
+
 func Create(c *gin.Context) {
 	article := model.Article{}
 	c.BindJSON(&article)

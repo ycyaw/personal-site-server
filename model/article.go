@@ -48,6 +48,29 @@ func QueryRowArticle(id int64) (Article, error) {
 	return article, err
 }
 
+// 依据类别查询表数据
+func QueryByArticleCategory(category string) ([]Article, error) {
+	var articles []Article
+
+	rows, err := Db.Query("SELECT * FROM article_t WHERE category = $1 ORDER BY releaseDate DESC Limit 20", category)
+	if err != nil {
+		log.Warning(err.Error())
+	}
+
+	for rows.Next() {
+		article := Article{}
+
+		err = rows.Scan(&article.Id, &article.Title, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+		if err != nil {
+			log.Warning(err.Error())
+		}
+
+		articles = append(articles, article)
+	}
+
+	return articles, err
+}
+
 // 查询最近的20条数据
 func LatestArticle() ([]Article, error) {
 	var articles []Article
