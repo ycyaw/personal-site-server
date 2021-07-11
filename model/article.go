@@ -34,7 +34,7 @@ func InsertArticle(title string, category string, content string) error {
 }
 
 // 依据id查询表数据
-func QueryRowArticle(id int) (Article, error) {
+func QueryRowArticle(id int64) (Article, error) {
 	// 保存查询的数据
 	article := Article{}
 
@@ -43,7 +43,7 @@ func QueryRowArticle(id int) (Article, error) {
 
 	// 填充数据
 	err := Db.QueryRow(sql, id).
-		Scan(&article.Id, &article.Title, &article.Category, &article.Content, &article.ReleaseDate)
+		Scan(&article.Id, &article.Title, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
 
 	return article, err
 }

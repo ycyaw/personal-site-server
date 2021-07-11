@@ -21,6 +21,9 @@ func main() {
 	// 获取最新文章
 	r.GET("/api/latest", controller.Latest)
 
+	// 依据id获取指定文章
+	r.GET("api/article", controller.ArticleOfId)
+
 	// 新建文章
 	r.POST("/api/create", controller.Create)
 
