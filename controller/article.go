@@ -63,6 +63,22 @@ func ArticleByCategory(c *gin.Context) {
 	}
 }
 
+func SearchArticle(c *gin.Context) {
+	title := c.Query("title")
+
+	articles, err := model.QueryTitle(title)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"data": articles,
+		})
+	}
+}
+
 func Create(c *gin.Context) {
 	article := model.Article{}
 	c.BindJSON(&article)

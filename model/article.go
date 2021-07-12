@@ -71,6 +71,29 @@ func QueryByArticleCategory(category string) ([]Article, error) {
 	return articles, err
 }
 
+func QueryTitle(title string) ([]Article, error) {
+	var articles []Article
+
+	rows, err := Db.Query("SELECT * FROM article_t WHERE title LIKE '%' || $1 || '%' ORDER BY releaseDate DESC", title)
+	if err != nil {
+		log.Warning(err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		article := Article{}
+
+		err = rows.Scan(&article.Id, &article.Title, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+		if err != nil {
+			log.Warning(err.Error())
+		}
+
+		articles = append(articles, article)
+	}
+
+	return articles, err
+}
+
 // 查询最近的20条数据
 func LatestArticle() ([]Article, error) {
 	var articles []Article

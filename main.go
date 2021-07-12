@@ -27,6 +27,9 @@ func main() {
 	// 依据分类获取文章
 	r.GET("/api/articleyycategory", controller.ArticleByCategory)
 
+	// 搜索文章
+	r.GET("/api/search", controller.SearchArticle)
+
 	// 新建文章
 	r.POST("/api/create", controller.Create)
 
