@@ -45,6 +45,15 @@ func QueryRowArticle(id int64) (Article, error) {
 	// 填充数据
 	err := Db.QueryRow(sql, id).
 		Scan(&article.Id, &article.Title, &article.Author, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+	if err != nil {
+		log.Info(err.Error())
+	}
+
+	// 将阅读次数+1
+	err = Db.QueryRow("UPDATE article_t SET reading = reading + 1 WHERE id = $1", id).Err()
+	if err != nil {
+		log.Info(err.Error())
+	}
 
 	return article, err
 }
