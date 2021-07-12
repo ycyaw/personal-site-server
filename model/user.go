@@ -28,13 +28,14 @@ func AuthUser(email string, password string) (User, error) {
 }
 
 // 验证token
-func AuthToken(token string) error {
+func AuthToken(token string) (string, error) {
+	name := ""
 	// 查询并填充数据
-	err := Db.QueryRow("SELECT * FROM user_t WHERE token = $1", token).Err()
+	err := Db.QueryRow("SELECT name FROM user_t WHERE token = $1", token).Scan(&name)
 
 	if err != nil {
 		log.Info(err.Error())
 	}
 
-	return err
+	return name, err
 }

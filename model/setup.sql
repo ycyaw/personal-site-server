@@ -14,6 +14,7 @@ CREATE TABLE user_t(
 CREATE TABLE article_t(
     id          SERIAL PRIMARY KEY,
     title       VARCHAR(64),
+    author      VARCHAR(64),
     category    VARCHAR(8),
     content     TEXT,
     reading     BIGINT,

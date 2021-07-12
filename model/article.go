@@ -9,6 +9,7 @@ import (
 type Article struct {
 	Id          int       `json:"id"`
 	Title       string    `json:"title"`
+	Author      string    `json:"author"`
 	Category    string    `json:"category"`
 	Content     string    `json:"content"`
 	Reading     int       `json:"reading"`
@@ -16,8 +17,8 @@ type Article struct {
 }
 
 // 像数据库插入文章
-func InsertArticle(title string, category string, content string) error {
-	sql := "INSERT INTO article_t (title, category, content, reading, releaseDate) VALUES ($1, $2, $3, $4, $5)"
+func InsertArticle(title string, author string, category string, content string) error {
+	sql := "INSERT INTO article_t (title, author, category, content, reading, releaseDate) VALUES ($1, $2, $3, $4, $5, $6)"
 	stmt, err := Db.Prepare(sql)
 	if err != nil {
 		log.Warning(err.Error())
@@ -25,7 +26,7 @@ func InsertArticle(title string, category string, content string) error {
 	defer stmt.Close()
 
 	nowTime := time.Now().Format("2006-01-02 15:04:05")
-	err = stmt.QueryRow(title, category, content, 0, nowTime).Err()
+	err = stmt.QueryRow(title, author, category, content, 0, nowTime).Err()
 	if err != nil {
 		log.Warning(err.Error())
 	}
@@ -43,7 +44,7 @@ func QueryRowArticle(id int64) (Article, error) {
 
 	// 填充数据
 	err := Db.QueryRow(sql, id).
-		Scan(&article.Id, &article.Title, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+		Scan(&article.Id, &article.Title, &article.Author, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
 
 	return article, err
 }
@@ -60,7 +61,7 @@ func QueryByArticleCategory(category string) ([]Article, error) {
 	for rows.Next() {
 		article := Article{}
 
-		err = rows.Scan(&article.Id, &article.Title, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+		err = rows.Scan(&article.Id, &article.Title, &article.Author, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
 		if err != nil {
 			log.Warning(err.Error())
 		}
@@ -83,7 +84,7 @@ func QueryTitle(title string) ([]Article, error) {
 	for rows.Next() {
 		article := Article{}
 
-		err = rows.Scan(&article.Id, &article.Title, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+		err = rows.Scan(&article.Id, &article.Title, &article.Author, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
 		if err != nil {
 			log.Warning(err.Error())
 		}
@@ -106,7 +107,7 @@ func LatestArticle() ([]Article, error) {
 	for rows.Next() {
 		article := Article{}
 
-		err = rows.Scan(&article.Id, &article.Title, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+		err = rows.Scan(&article.Id, &article.Title, &article.Author, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
 		if err != nil {
 			log.Warning(err.Error())
 		}

@@ -10,7 +10,6 @@ import (
 )
 
 func Latest(c *gin.Context) {
-
 	articles, err := model.LatestArticle()
 
 	if err != nil {
@@ -22,12 +21,10 @@ func Latest(c *gin.Context) {
 			"data": articles,
 		})
 	}
-	
 }
 
 func ArticleOfId(c *gin.Context) {
 	ids := c.Query("id")
-
 
 	id, err := strconv.ParseInt(ids, 10, 32)
 	if err != nil {
@@ -80,18 +77,28 @@ func SearchArticle(c *gin.Context) {
 }
 
 func Create(c *gin.Context) {
-	article := model.Article{}
-	c.BindJSON(&article)
+	authorization := c.Request.Header.Get("Authorization")
 
-	err := model.InsertArticle(article.Title, article.Category, article.Content)
+	name, err := model.AuthToken(authorization)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "error",
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "ok",
-		})
+		article := model.Article{}
+		c.BindJSON(&article)
+
+		err = model.InsertArticle(article.Title, name, article.Category, article.Content)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"msg": "error",
+			})
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"msg": "ok",
+			})
+		}
 	}
 }
