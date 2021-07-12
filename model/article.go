@@ -62,11 +62,14 @@ func QueryRowArticle(id int64) (Article, error) {
 func QueryByArticleCategory(category string) ([]Article, error) {
 	var articles []Article
 
+	// 依据类别查询最新的文章，条数为20
 	rows, err := Db.Query("SELECT * FROM article_t WHERE category = $1 ORDER BY releaseDate DESC Limit 20", category)
 	if err != nil {
 		log.Warning(err.Error())
 	}
+	defer rows.Close()
 
+	// 将数据放入数组中
 	for rows.Next() {
 		article := Article{}
 
@@ -81,15 +84,18 @@ func QueryByArticleCategory(category string) ([]Article, error) {
 	return articles, err
 }
 
+// 依据文章标题关键字查询
 func QueryTitle(title string) ([]Article, error) {
 	var articles []Article
 
+	// 通过文章关键字查询最新的文章
 	rows, err := Db.Query("SELECT * FROM article_t WHERE title LIKE '%' || $1 || '%' ORDER BY releaseDate DESC", title)
 	if err != nil {
 		log.Warning(err.Error())
 	}
 	defer rows.Close()
 
+	// 将数据放入数组中
 	for rows.Next() {
 		article := Article{}
 
@@ -112,7 +118,9 @@ func LatestArticle() ([]Article, error) {
 	if err != nil {
 		log.Warning(err.Error())
 	}
+	defer rows.Close()
 
+	// 将数据放入数组中
 	for rows.Next() {
 		article := Article{}
 

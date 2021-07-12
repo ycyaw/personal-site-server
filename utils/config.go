@@ -6,14 +6,16 @@ import (
 	"personal-site/log"
 )
 
-
+// 可配置项结构体
 type Configuration struct {
 	Addr string
 	Port string
 }
 
+// 配置数据
 var Config Configuration
 
+// 加载json文件配置
 func LoadConfig(path string) {
 	// 打开文件
 	file, err := os.Open(path)
