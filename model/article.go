@@ -33,7 +33,7 @@ func converArticle(article Article) ResponseArticle {
 		Id:          article.Id,
 		Title:       article.Title,
 		Author:      article.Author,
-		Category:    article.Author,
+		Category:    article.Category,
 		Content:     article.Content,
 		Reading:     article.Reading,
 		ReleaseDate: article.ReleaseDate.Format("2006-01-02 15:04:05"),
