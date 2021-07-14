@@ -16,6 +16,32 @@ type Article struct {
 	ReleaseDate time.Time `json:"releaseDate"`
 }
 
+type ResponseArticle struct {
+	Id          int    `json:"id"`
+	Title       string `json:"title"`
+	Author      string `json:"author"`
+	Category    string `json:"category"`
+	Content     string `json:"content"`
+	Reading     int    `json:"reading"`
+	ReleaseDate string `json:"releaseDate"`
+}
+
+// 将Article转换为ResponseArticle
+func converArticle(article Article) ResponseArticle {
+	// 转换数据封装
+	response := ResponseArticle{
+		Id:          article.Id,
+		Title:       article.Title,
+		Author:      article.Author,
+		Category:    article.Author,
+		Content:     article.Content,
+		Reading:     article.Reading,
+		ReleaseDate: article.ReleaseDate.Format("2006-01-02 15:04:05"),
+	}
+
+	return response
+}
+
 // 像数据库插入文章
 func InsertArticle(title string, author string, category string, content string) error {
 	sql := "INSERT INTO article_t (title, author, category, content, reading, releaseDate) VALUES ($1, $2, $3, $4, $5, $6)"
@@ -35,7 +61,7 @@ func InsertArticle(title string, author string, category string, content string)
 }
 
 // 依据id查询表数据
-func QueryRowArticle(id int64) (Article, error) {
+func QueryRowArticle(id int64) (ResponseArticle, error) {
 	// 保存查询的数据
 	article := Article{}
 
@@ -49,18 +75,21 @@ func QueryRowArticle(id int64) (Article, error) {
 		log.Info(err.Error())
 	}
 
+	// 转换数据封装
+	responseArticle := converArticle(article)
+
 	// 将阅读次数+1
 	err = Db.QueryRow("UPDATE article_t SET reading = reading + 1 WHERE id = $1", id).Err()
 	if err != nil {
 		log.Info(err.Error())
 	}
 
-	return article, err
+	return responseArticle, err
 }
 
 // 依据类别查询表数据
-func QueryByArticleCategory(category string) ([]Article, error) {
-	var articles []Article
+func QueryByArticleCategory(category string) ([]ResponseArticle, error) {
+	var articles []ResponseArticle
 
 	// 依据类别查询最新的文章，条数为20
 	rows, err := Db.Query("SELECT * FROM article_t WHERE category = $1 ORDER BY releaseDate DESC Limit 20", category)
@@ -78,15 +107,18 @@ func QueryByArticleCategory(category string) ([]Article, error) {
 			log.Warning(err.Error())
 		}
 
-		articles = append(articles, article)
+		// 转换数据封装
+		responseArticle := converArticle(article)
+
+		articles = append(articles, responseArticle)
 	}
 
 	return articles, err
 }
 
 // 依据文章标题关键字查询
-func QueryTitle(title string) ([]Article, error) {
-	var articles []Article
+func QueryTitle(title string) ([]ResponseArticle, error) {
+	var articles []ResponseArticle
 
 	// 通过文章关键字查询最新的文章
 	rows, err := Db.Query("SELECT * FROM article_t WHERE title LIKE '%' || $1 || '%' ORDER BY releaseDate DESC", title)
@@ -104,15 +136,18 @@ func QueryTitle(title string) ([]Article, error) {
 			log.Warning(err.Error())
 		}
 
-		articles = append(articles, article)
+		// 转换数据封装
+		responseArticle := converArticle(article)
+
+		articles = append(articles, responseArticle)
 	}
 
 	return articles, err
 }
 
 // 查询最近的20条数据
-func LatestArticle() ([]Article, error) {
-	var articles []Article
+func LatestArticle() ([]ResponseArticle, error) {
+	var articles []ResponseArticle
 
 	rows, err := Db.Query("SELECT * FROM article_t ORDER BY releaseDate DESC Limit 20")
 	if err != nil {
@@ -129,7 +164,10 @@ func LatestArticle() ([]Article, error) {
 			log.Warning(err.Error())
 		}
 
-		articles = append(articles, article)
+		// 转换数据封装
+		responseArticle := converArticle(article)
+
+		articles = append(articles, responseArticle)
 	}
 
 	return articles, err
