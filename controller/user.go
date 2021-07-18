@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"personal-site/model"
 
@@ -13,7 +12,7 @@ func UserLogin(c *gin.Context) {
 	var user model.User
 
 	// 获取数据
-	fmt.Println(c.BindJSON(&user))
+	c.BindJSON(&user)
 
 	// 验证用户
 	user, err := model.QueryUserOfEmailAndPasswd(user.Email, user.Password)

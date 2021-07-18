@@ -15,17 +15,17 @@ type User struct {
 }
 
 type ResponseUser struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Token    string `json:"token"`
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Token string `json:"token"`
 }
 
 // 转换数据封装
 func converUser(user User) ResponseUser {
 	response := ResponseUser{
-		Id: user.Id,
-		Name: user.Name,
+		Id:    user.Id,
+		Name:  user.Name,
 		Email: user.Email,
 		Token: user.Token,
 	}
