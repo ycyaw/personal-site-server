@@ -88,7 +88,7 @@ func QueryRowArticle(id int64) (ResponseArticle, error) {
 }
 
 // 依据类别查询表数据
-func QueryByArticleCategory(category string) ([]ResponseArticle, error) {
+func QueryArticleByCategory(category string) ([]ResponseArticle, error) {
 	var articles []ResponseArticle
 
 	// 依据类别查询最新的文章，条数为20
@@ -117,7 +117,7 @@ func QueryByArticleCategory(category string) ([]ResponseArticle, error) {
 }
 
 // 依据文章标题关键字查询
-func QueryTitle(title string) ([]ResponseArticle, error) {
+func QueryArticleOfTitle(title string) ([]ResponseArticle, error) {
 	var articles []ResponseArticle
 
 	// 通过文章关键字查询最新的文章
@@ -146,7 +146,7 @@ func QueryTitle(title string) ([]ResponseArticle, error) {
 }
 
 // 查询最近的20条数据
-func LatestArticle() ([]ResponseArticle, error) {
+func QueryArticleOfLatest() ([]ResponseArticle, error) {
 	var articles []ResponseArticle
 
 	rows, err := Db.Query("SELECT * FROM article_t ORDER BY releaseDate DESC Limit 20")

@@ -21,7 +21,7 @@ func Login(c *gin.Context) {
 	fmt.Println(c.BindJSON(&info))
 
 	// 验证用户
-	user, err := model.AuthUser(info.Account, info.Password)
+	user, err := model.QueryUserOfEmailAndPasswd(info.Account, info.Password)
 
 	// 返回错误信息
 	if err != nil {

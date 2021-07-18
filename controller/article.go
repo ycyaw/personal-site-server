@@ -9,10 +9,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// 返回文章接口
+// 通过category参数查询文章分类
+// 通过search参数查询文章
+// 通过id参数查询指定文章
+// 无参数返回最新文章
+func Article(c *gin.Context) {
+	// 获id取参数
+	if ids := c.Query("id"); ids != "" {
+		articleOfId(c)
+
+	} else if category := c.Query("category"); category != "" {
+		// 获取类别参数
+		articleByCategory(c)
+
+	} else if search := c.Query("search"); search != "" {
+		// 获取搜索参数
+		articleByKey(c)
+
+	} else {
+		// 无参数时返回最新文章
+		articleByOrder(c)
+	}
+}
+
 // 响应最近的文章数据
-func Latest(c *gin.Context) {
+func articleByOrder(c *gin.Context) {
 	// 从数据库获取数据
-	articles, err := model.LatestArticle()
+	articles, err := model.QueryArticleOfLatest()
 
 	// 返回数据
 	if err != nil {
@@ -27,7 +51,7 @@ func Latest(c *gin.Context) {
 }
 
 // 通过文章Id查询文章
-func ArticleOfId(c *gin.Context) {
+func articleOfId(c *gin.Context) {
 	// 获取参数
 	ids := c.Query("id")
 
@@ -53,12 +77,12 @@ func ArticleOfId(c *gin.Context) {
 }
 
 // 通过文章类别查询文章
-func ArticleByCategory(c *gin.Context) {
+func articleByCategory(c *gin.Context) {
 	// 获取参数
 	category := c.Query("category")
 
 	// 从数据库获取数据
-	articles, err := model.QueryByArticleCategory(category)
+	articles, err := model.QueryArticleByCategory(category)
 
 	// 返回数据
 	if err != nil {
@@ -73,12 +97,12 @@ func ArticleByCategory(c *gin.Context) {
 }
 
 // 通过文章关键字搜索文章
-func SearchArticle(c *gin.Context) {
+func articleByKey(c *gin.Context) {
 	// 获取参数
-	title := c.Query("title")
+	search := c.Query("search")
 
 	// 从数据库获取数据
-	articles, err := model.QueryTitle(title)
+	articles, err := model.QueryArticleOfTitle(search)
 
 	// 返回数据
 	if err != nil {
@@ -97,30 +121,24 @@ func Create(c *gin.Context) {
 	// 获取http头部信息
 	authorization := c.Request.Header.Get("Authorization")
 
-	// 验证获取的token
-	name, err := model.AuthToken(authorization)
+	// 通过token获取用户名
+	name := model.QueryUserOfToken(authorization)
 
-	// 返回数据
+	// 插入的数据数据
+	article := model.Article{}
+	// 获取josn数据
+	c.BindJSON(&article)
+
+	// 将数据插入表中
+	err := model.InsertArticle(article.Title, name, article.Category, article.Content)
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "error",
 		})
 	} else {
-		article := model.Article{}
-		// 获取josn数据
-		c.BindJSON(&article)
-
-		// 将数据插入表中
-		err = model.InsertArticle(article.Title, name, article.Category, article.Content)
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"msg": "error",
-			})
-		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"msg": "ok",
-			})
-		}
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "ok",
+		})
 	}
 }

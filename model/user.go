@@ -12,7 +12,7 @@ type User struct {
 }
 
 // 依据邮箱和密码验证用户
-func AuthUser(email string, password string) (User, error) {
+func QueryUserOfEmailAndPasswd(email string, password string) (User, error) {
 	user := User{}
 
 	// 查询并填充数据
@@ -27,8 +27,8 @@ func AuthUser(email string, password string) (User, error) {
 	return user, err
 }
 
-// 验证token
-func AuthToken(token string) (string, error) {
+// 通过token查询用户名
+func QueryUserOfToken(token string) string {
 	name := ""
 	// 查询并填充数据
 	err := Db.QueryRow("SELECT name FROM user_t WHERE token = $1", token).Scan(&name)
@@ -37,5 +37,17 @@ func AuthToken(token string) (string, error) {
 		log.Info(err.Error())
 	}
 
-	return name, err
+	return name
+}
+
+// 验证token
+func QueryUserToken(token string) error {
+	// 查询数据
+	err := Db.QueryRow("SELECT * FROM user_t WHERE token = $1", token).Err()
+
+	if err != nil {
+		log.Info(err.Error())
+	}
+
+	return err
 }

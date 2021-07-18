@@ -15,23 +15,22 @@ func init() {
 func main() {
 	r := gin.Default()
 
-	// 登录接口
-	r.POST("/api/login", controller.Login)
+	// API路由组
+	api := r.Group("/api")
+	{
+		// 返回文章接口
+		api.GET("/article", controller.Article)
 
-	// 获取最新文章
-	r.GET("/api/latest", controller.Latest)
+		// 用户操作路由组
+		user := api.Group("/user")
+		{
+			// 登录接口
+			user.POST("/login", controller.Login)
 
-	// 依据id获取指定文章
-	r.GET("/api/article", controller.ArticleOfId)
-
-	// 依据分类获取文章
-	r.GET("/api/articleyycategory", controller.ArticleByCategory)
-
-	// 搜索文章
-	r.GET("/api/search", controller.SearchArticle)
-
-	// 新建文章
-	r.POST("/api/create", controller.Create)
+			// 创建文章接口
+			user.POST("/article", utils.AuthMiddleware(), controller.Create)
+		}
+	}
 
 	r.Run(utils.Config.Port)
 }
