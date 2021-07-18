@@ -2,6 +2,7 @@ package main
 
 import (
 	"personal-site/controller"
+	"personal-site/middleware"
 	"personal-site/utils"
 
 	"github.com/gin-gonic/gin"
@@ -25,10 +26,16 @@ func main() {
 		user := api.Group("/user")
 		{
 			// 登录接口
-			user.POST("/login", controller.Login)
+			user.POST("/login", controller.UserLogin)
+
+			// 注册接口
+			user.POST("/register", controller.UserRegister)
+
+			// 获取个人信息
+			user.POST("/info", middleware.AuthMiddleware, controller.UserInfo)
 
 			// 创建文章接口
-			user.POST("/article", utils.AuthMiddleware(), controller.Create)
+			user.POST("/article", middleware.AuthMiddleware, controller.ArticleCreate)
 		}
 	}
 

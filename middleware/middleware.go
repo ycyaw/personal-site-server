@@ -8,24 +8,25 @@ import (
 )
 
 // 验证用户token中间件
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// 获取http头部信息
-		authorization := c.Request.Header.Get("Authorization")
+func AuthMiddleware(c *gin.Context) {
+	// 获取http头部信息
+	authorization := c.Request.Header.Get("Authorization")
 
-		// 验证获取的token
-		err := model.QueryUserToken(authorization)
+	// 验证获取的token
+	responseUser, err := model.QueryUserOfToken(authorization)
 
-		if err != nil {
-			// 返回错误信息
-			c.JSON(http.StatusBadRequest, gin.H{
-				"msg": "error",
-			})
-			// 终止后续执行
-			c.Abort()
-		} else {
-			// 验证成功继续执行后续操作
-			c.Next()
-		}
+	// 验证失败时终止后续执行操作
+	if err != nil {
+		// 返回错误信息
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+		// 终止后续执行
+		c.Abort()
+	} else {
+		// 设置需要后续使用的数据
+		c.Set("email", responseUser.Email)
+		c.Set("name", responseUser.Name)
+		c.Set("token", responseUser.Token)
 	}
 }

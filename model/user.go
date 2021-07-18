@@ -1,6 +1,9 @@
 package model
 
-import "personal-site/log"
+import (
+	"personal-site/log"
+	"personal-site/utils"
+)
 
 // User表结构
 type User struct {
@@ -11,42 +14,66 @@ type User struct {
 	Token    string `json:"token"`
 }
 
+type ResponseUser struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Token    string `json:"token"`
+}
+
+// 转换数据封装
+func converUser(user User) ResponseUser {
+	response := ResponseUser{
+		Name: user.Name,
+		Email: user.Email,
+		Token: user.Token,
+	}
+
+	return response
+}
+
 // 依据邮箱和密码验证用户
 func QueryUserOfEmailAndPasswd(email string, password string) (User, error) {
 	user := User{}
 
 	// 查询并填充数据
 	sql := "SELECT * FROM user_t WHERE email = $1 AND password = $2"
-	err := Db.QueryRow(sql, email, password).
+	err := Db.QueryRow(sql, email, utils.EncodeMd5(password)).
 		Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Token)
 
 	if err != nil {
-		log.Info(err.Error())
+		log.Warning(err.Error())
 	}
 
 	return user, err
 }
 
-// 通过token查询用户名
-func QueryUserOfToken(token string) string {
-	name := ""
+// 通过token查询用户信息
+func QueryUserOfToken(token string) (ResponseUser, error) {
+	user := User{}
 	// 查询并填充数据
-	err := Db.QueryRow("SELECT name FROM user_t WHERE token = $1", token).Scan(&name)
+	err := Db.QueryRow("SELECT id, email, name, token FROM user_t WHERE token = $1", token).
+		Scan(&user.Id, &user.Email, &user.Name, &user.Token)
 
 	if err != nil {
-		log.Info(err.Error())
+		log.Warning(err.Error())
 	}
 
-	return name
+	responseUser := converUser(user)
+
+	return responseUser, err
 }
 
-// 验证token
-func QueryUserToken(token string) error {
-	// 查询数据
-	err := Db.QueryRow("SELECT * FROM user_t WHERE token = $1", token).Err()
-
+// 插入新用户
+func InsertUser(email string, name string, password string) error {
+	stmt, err := Db.Prepare("INSERT INTO user_t (name, email, password, token) VALUES ($1, $2, $3, $4)")
 	if err != nil {
-		log.Info(err.Error())
+		log.Warning(err.Error())
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(name, email, utils.EncodeMd5(password), utils.EncodeToken())
+	if err != nil {
+		log.Warning(err.Error())
 	}
 
 	return err

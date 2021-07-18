@@ -117,12 +117,10 @@ func articleByKey(c *gin.Context) {
 }
 
 // 将用户的文章插入数据库中
-func Create(c *gin.Context) {
-	// 获取http头部信息
-	authorization := c.Request.Header.Get("Authorization")
-
-	// 通过token获取用户名
-	name := model.QueryUserOfToken(authorization)
+func ArticleCreate(c *gin.Context) {
+	// 获取中间件设置的信息
+	name, _ := c.Get("name")
+	nameStr := name.(string)
 
 	// 插入的数据数据
 	article := model.Article{}
@@ -130,7 +128,7 @@ func Create(c *gin.Context) {
 	c.BindJSON(&article)
 
 	// 将数据插入表中
-	err := model.InsertArticle(article.Title, name, article.Category, article.Content)
+	err := model.InsertArticle(article.Title, nameStr, article.Category, article.Content)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
