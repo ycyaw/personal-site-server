@@ -54,8 +54,9 @@ func UserRegister(c *gin.Context) {
 }
 
 // 返回用户信息
-func UserInfo(c *gin.Context) {
+func UserGet(c *gin.Context) {
 	// 获取中间件设置的信息
+	id, _ := c.Get("id")
 	email, _ := c.Get("email")
 	name, _ := c.Get("name")
 	token, _ := c.Get("token")
@@ -63,9 +64,34 @@ func UserInfo(c *gin.Context) {
 	// 返回数据
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
+			"id":    id,
 			"email": email,
-			"name": name,
+			"name":  name,
 			"token": token,
 		},
 	})
+}
+
+// 更新用户信息
+func UserPatch(c *gin.Context) {
+	// 获取用户id
+	id, _ := c.Get("id")
+	idStr := id.(string)
+
+	// 获取json数据
+	user := model.User{}
+	c.BindJSON(&user)
+
+	err := model.UpdateUser(idStr, user.Email, user.Name)
+
+	// 返回数据
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "ok",
+		})
+	}
 }

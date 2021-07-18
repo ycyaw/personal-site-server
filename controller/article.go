@@ -140,3 +140,67 @@ func ArticleCreate(c *gin.Context) {
 		})
 	}
 }
+
+// 通过ID获取指定的文章
+func ArticleGet(c *gin.Context) {
+	// 获取id参数
+	id := c.Param("id")
+
+	responseArticle, err := model.QueryArticleOfId(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"data": responseArticle,
+		})
+	}
+}
+
+// 通过Id更新指定的文章
+func ArticlePatch(c *gin.Context) {
+	// 获取id参数
+	id := c.Param("id")
+
+	// 获取json数据
+	article := model.Article{}
+	c.BindJSON(&article)
+
+	// 更新数据
+	err := model.UpdateArticle(id, article.Title, article.Category, article.Content)
+
+	// 返回响应数据
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "ok",
+		})
+	}
+}
+
+// 通过ID删除指定的文章
+func ArticleDelete(c *gin.Context) {
+	// 获取中间件设置信息
+	name, _ := c.Get("name")
+	nameStr := name.(string)
+
+	// 获取id参数
+	id := c.Param("id")
+
+	err := model.DeleteArticleOfId(id, nameStr)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "error",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "ok",
+		})
+	}
+}

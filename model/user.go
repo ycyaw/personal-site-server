@@ -15,6 +15,7 @@ type User struct {
 }
 
 type ResponseUser struct {
+	Id       int    `json:"id"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Token    string `json:"token"`
@@ -23,6 +24,7 @@ type ResponseUser struct {
 // 转换数据封装
 func converUser(user User) ResponseUser {
 	response := ResponseUser{
+		Id: user.Id,
 		Name: user.Name,
 		Email: user.Email,
 		Token: user.Token,
@@ -72,6 +74,22 @@ func InsertUser(email string, name string, password string) error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(name, email, utils.EncodeMd5(password), utils.EncodeToken())
+	if err != nil {
+		log.Warning(err.Error())
+	}
+
+	return err
+}
+
+// 更新用户信息
+func UpdateUser(id string, email string, name string) error {
+	stmt, err := Db.Prepare("UPDATE user_t SET email = $1, name = $2 WHERE id = $3")
+	if err != nil {
+		log.Warning(err.Error())
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(email, name, id)
 	if err != nil {
 		log.Warning(err.Error())
 	}

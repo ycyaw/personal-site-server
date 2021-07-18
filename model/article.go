@@ -172,3 +172,59 @@ func QueryArticleOfLatest() ([]ResponseArticle, error) {
 
 	return articles, err
 }
+
+// 通过Id查询文章
+func QueryArticleOfId(id string) (ResponseArticle, error) {
+	// 保存查询的数据
+	article := Article{}
+
+	// 依据id查询数据
+	stmt, err := Db.Prepare("SELECT * FROM article_t WHERE id = $1")
+	if err != nil {
+		log.Warning(err.Error())
+	}
+
+	// 填充数据
+	err = stmt.QueryRow(id).
+		Scan(&article.Id, &article.Title, &article.Author, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+	if err != nil {
+		log.Warning(err.Error())
+	}
+
+	// 转换数据封装
+	responseArticle := converArticle(article)
+
+	return responseArticle, err
+}
+
+// 更新指定Id的文章内容
+func UpdateArticle(id string, title string, category string, content string) error {
+	stmt, err := Db.Prepare("UPDATE article_t SET title = $1, category = $2, content = $3  WHERE id = $4")
+	if err != nil {
+		log.Warning(err.Error())
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(title, category, content, id)
+	if err != nil {
+		log.Warning(err.Error())
+	}
+
+	return err
+}
+
+// 通过Id删除指定文章
+func DeleteArticleOfId(id string, name string) error {
+	stmt, err := Db.Prepare("DELETE FROM article_t WHERE id = $1 AND author = $2")
+	if err != nil {
+		log.Warning(err.Error())
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id, name)
+	if err != nil {
+		log.Warning(err.Error())
+	}
+
+	return err
+}

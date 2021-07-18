@@ -25,6 +25,7 @@ func AuthMiddleware(c *gin.Context) {
 		c.Abort()
 	} else {
 		// 设置需要后续使用的数据
+		c.Set("id", responseUser.Id)
 		c.Set("email", responseUser.Email)
 		c.Set("name", responseUser.Name)
 		c.Set("token", responseUser.Token)
