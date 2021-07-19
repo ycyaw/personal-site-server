@@ -62,7 +62,7 @@ func articleOfId(c *gin.Context) {
 	}
 
 	// 从数据库获取数据
-	article, err := model.QueryRowArticle(id)
+	article, err := model.QueryArticleOfId(id)
 
 	// 返回数据
 	if err != nil {
@@ -143,10 +143,11 @@ func ArticleCreate(c *gin.Context) {
 
 // 通过ID获取指定的文章
 func ArticleGet(c *gin.Context) {
-	// 获取id参数
-	id := c.Param("id")
+	// 获取中间件设置信息
+	name, _ := c.Get("name")
+	nameStr := name.(string)
 
-	responseArticle, err := model.QueryArticleOfId(id)
+	responseArticle, err := model.QueryArticleOfName(nameStr)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

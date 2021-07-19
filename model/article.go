@@ -61,7 +61,7 @@ func InsertArticle(title string, author string, category string, content string)
 }
 
 // 依据id查询表数据
-func QueryRowArticle(id int64) (ResponseArticle, error) {
+func QueryArticleOfId(id int64) (ResponseArticle, error) {
 	// 保存查询的数据
 	article := Article{}
 
@@ -173,28 +173,33 @@ func QueryArticleOfLatest() ([]ResponseArticle, error) {
 	return articles, err
 }
 
-// 通过Id查询文章
-func QueryArticleOfId(id string) (ResponseArticle, error) {
+// 通过作者姓名查询文章
+func QueryArticleOfName(name string) ([]ResponseArticle, error) {
 	// 保存查询的数据
-	article := Article{}
+	var responseArticles []ResponseArticle
 
-	// 依据id查询数据
-	stmt, err := Db.Prepare("SELECT * FROM article_t WHERE id = $1")
+	// 依据姓名查询数据
+	rows, err := Db.Query("SELECT * FROM article_t WHERE author = $1", name)
 	if err != nil {
 		log.Warning(err.Error())
 	}
+	defer rows.Close()
 
 	// 填充数据
-	err = stmt.QueryRow(id).
-		Scan(&article.Id, &article.Title, &article.Author, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
-	if err != nil {
-		log.Warning(err.Error())
+	for rows.Next() {
+		article := Article{}
+
+		// 填充数据
+		err = rows.Scan(&article.Id, &article.Title, &article.Author, &article.Category, &article.Content, &article.Reading, &article.ReleaseDate)
+		if err != nil {
+			log.Warning(err.Error())
+		}
+
+		// 转换数据封装，并添加到数组中
+		responseArticles = append(responseArticles, converArticle(article))
 	}
 
-	// 转换数据封装
-	responseArticle := converArticle(article)
-
-	return responseArticle, err
+	return responseArticles, err
 }
 
 // 更新指定Id的文章内容

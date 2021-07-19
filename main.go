@@ -39,8 +39,8 @@ func main() {
 			// 更新指定的用户信息
 			user.PATCH("/user", controller.UserPatch)
 
-			// 获取指定的文章
-			user.GET("/article/:id", controller.ArticleGet)
+			// 获取该用户全部文章
+			user.GET("/article", controller.ArticleGet)
 
 			// 创建文章接口
 			user.POST("/article", controller.ArticleCreate)
