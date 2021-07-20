@@ -179,7 +179,7 @@ func QueryArticleOfName(name string) ([]ResponseArticle, error) {
 	var responseArticles []ResponseArticle
 
 	// 依据姓名查询数据
-	rows, err := Db.Query("SELECT * FROM article_t WHERE author = $1", name)
+	rows, err := Db.Query("SELECT * FROM article_t WHERE author = $1 ORDER BY releaseDate DESC", name)
 	if err != nil {
 		log.Warning(err.Error())
 	}
