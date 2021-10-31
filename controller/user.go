@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"personal-site/log"
 	"personal-site/model"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,7 @@ func UserLogin(c *gin.Context) {
 
 	// 获取数据
 	c.BindJSON(&user)
-
+	log.Info("用户登录")
 	// 验证用户
 	user, err := model.QueryUserOfEmailAndPasswd(user.Email, user.Password)
 

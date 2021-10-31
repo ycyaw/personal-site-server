@@ -6,21 +6,35 @@ import (
 	"personal-site/log"
 )
 
+type MysqlConf struct{
+	Addr string `json:"addr"`
+	Port string `json:"port"`
+	Database string `json:"database"`
+	User string `json:"user"`
+	Password string `json:"password"`
+}
+
 // 可配置项结构体
 type Configuration struct {
-	Addr string
-	Port string
+	Addr string	`json:"addr"`
+	Port string `json:"port"`
+	MysqlConf MysqlConf `json:"mysqlConf"`
 }
 
 // 配置数据
 var Config Configuration
 
+var path string="config.json"
+
+func init() {
+	LoadConfig(path)
+}
 // 加载json文件配置
 func LoadConfig(path string) {
 	// 打开文件
 	file, err := os.Open(path)
 	if err != nil {
-		log.Error(err.Error())
+		log.Error("conf file open error :",err.Error())
 	}
 
 	// 创建json解析器
@@ -31,4 +45,5 @@ func LoadConfig(path string) {
 	if err != nil {
 		log.Error(err.Error())
 	}
+	log.Info("配置参数: ",Config)
 }

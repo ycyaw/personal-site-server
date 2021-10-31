@@ -15,7 +15,7 @@ CREATE TABLE article_t(
     id          SERIAL PRIMARY KEY,
     title       VARCHAR(64),
     author      VARCHAR(64),
-    category    VARCHAR(8),
+    category    VARCHAR(8),l
     content     TEXT,
     reading     BIGINT,
     releaseDate TIMESTAMP

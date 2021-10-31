@@ -38,14 +38,12 @@ func QueryUserOfEmailAndPasswd(email string, password string) (User, error) {
 	user := User{}
 
 	// 查询并填充数据
-	sql := "SELECT * FROM user_t WHERE email = $1 AND password = $2"
-	err := Db.QueryRow(sql, email, utils.EncodeMd5(password)).
+	sql := `SELECT * FROM user_t WHERE email = ? AND password = ?;`
+	err := Db.QueryRow(sql, email, password).
 		Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Token)
-
 	if err != nil {
 		log.Warning(err.Error())
 	}
-
 	return user, err
 }
 
